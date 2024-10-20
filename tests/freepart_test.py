@@ -42,4 +42,4 @@ def test_currency_home(browser):
 #     button2 = browser.find_element(By.XPATH, '//*[@id="form-currency"]/div/ul/li[1]/a')
 #     button2.click()
 #
-# fwer4343
+# fwer4343444444
