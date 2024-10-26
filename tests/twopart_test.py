@@ -18,3 +18,6 @@ def test_check_title_registration_user(browser):
 def test_check_title_administration(browser):
     browser.get("http://192.168.0.161:8081/administration/")
     assert "Administration" in browser.title, "Тайтл страницы отличается от ожидаемого"
+
+
+#
