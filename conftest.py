@@ -1,9 +1,9 @@
 import pytest
 from selenium import webdriver
 
+
 def pytest_addoption(parser):
     parser.addoption("--browser", default="chrome")
-
 
 
 @pytest.fixture()
@@ -12,7 +12,5 @@ def browser(pytestconfig):
 
     if browser_name in ["ch", "chrome"]:
         return webdriver.Chrome()
-
-#
-
-
+    elif browser_name in ["ff", "firefox"]:
+        return webdriver.Firefox()
