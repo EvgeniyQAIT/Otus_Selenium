@@ -3,8 +3,10 @@ from page_objects.catalog_page import CatalogPage
 from page_objects.product_card_page import ProductPage
 from page_objects.admin_page import AdminPage
 from page_objects.registr_user_page import RegistrPage
+import allure
 
 
+@allure.title("Проверка title на главной странице сервиса")
 def test_main_page(browser):
     main_page = MainPage(browser)
     main_page.open()
@@ -14,6 +16,7 @@ def test_main_page(browser):
     main_page.check_privacy_policy()
 
 
+@allure.title("Проверка title на странице каталога")
 def test_page_catalog(browser):
     catalog_page = CatalogPage(browser)
     catalog_page.open()
@@ -23,6 +26,7 @@ def test_page_catalog(browser):
     catalog_page.check_elements()
 
 
+@allure.title("Проверка title на странице продукта")
 def test_page_product(browser):
     product_page = ProductPage(browser)
     product_page.open_main_page()
@@ -31,6 +35,7 @@ def test_page_product(browser):
     product_page.check_elements()
 
 
+@allure.title("Проверка title на странице входа в администратора")
 def test_admin_page(browser):
     admin_page = AdminPage(browser)
     admin_page.go_to_administration()
@@ -38,6 +43,7 @@ def test_admin_page(browser):
     admin_page.check_elements()
 
 
+@allure.title("Проверка title на странице регистрации пользователя")
 def test_page_register_users(browser):
     reg_user_page = RegistrPage(browser)
     reg_user_page.open()
