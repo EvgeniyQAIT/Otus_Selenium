@@ -3,7 +3,7 @@ from random import randint
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
 from page_objects.base_page import BasePage
-
+import allure
 
 class CartPage(BasePage):
     DESCRIPTION_PRODUCTS = (By.XPATH, "//*[@class='description']/h4/a")
@@ -14,9 +14,11 @@ class CartPage(BasePage):
     )
     PRODUCT_NAME = (By.XPATH, "//td[contains(@class, 'text-wrap')]/a")
 
+    @allure.step("Выполняется вход на главную страницу")
     def go_to_main_page(self):
         super().open(self.browser.base_url)
 
+    @allure.step("Проверка добавления продукта в корзину")
     def add_item_to_cart(self, quantity_cards):
         products = self.find_elements(*self.DESCRIPTION_PRODUCTS)
         assert (
@@ -30,6 +32,7 @@ class CartPage(BasePage):
         cart_items[item].click()
         return product_to_add
 
+    @allure.step("Проверка добавленного продукта в корзине")
     def verify_product_in_cart(self, expected_product_name):
         cart = self.find_element(*self.SHOPPING_CART_LINK)
         ActionChains(self.browser).move_to_element(cart).perform()
