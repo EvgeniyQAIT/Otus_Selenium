@@ -1,0 +1,99 @@
+services:
+
+  selenoid:
+    container_name: selenoid
+    image: "aerokube/selenoid:1.11.3"
+    networks:
+      - selenoid
+    ports:
+      - "4444:4444"
+    volumes:
+      - ./config/browsers.json:/etc/selenoid/browsers.json:ro
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    command: ["-container-network=selenoid", "limit=12", "-conf", "/etc/selenoid/browsers.json", "-video-output-dir", "/opt/selenoid/video", "-log-output-dir", "/opt/selenoid/logs", "-container-network", "selenoid"]
+
+  selenoid-ui:
+    container_name: selenoid-ui
+    depends_on:
+      - selenoid
+    image: "aerokube/selenoid-ui:1.10.11"
+    ports:
+      - "8091:8080"
+    networks:
+      - selenoid
+    command: [ "--selenoid-uri", "http://selenoid:4444", "-listen", ":8090" ]
+
+
+  phpadmin:
+    container_name: phpadmin-1
+    image: 'phpmyadmin/phpmyadmin:latest'
+    networks:
+      - selenoid
+    environment:
+      - PMA_HOST=mariadb
+      - PMA_PORT=3306
+      - PMA_USER=bn_opencart
+    ports:
+      - '8889:80'
+
+  mariadb:
+    container_name: mariadb-1
+    image: docker.io/bitnami/mariadb:11.2
+    networks:
+      - selenoid
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - MARIADB_USER=bn_opencart
+      - MARIADB_DATABASE=bitnami_opencart
+    volumes:
+      - 'mariadb_data:/bitnami/mariadb'
+    ports:
+      - '3306:3306'
+    depends_on:
+      - selenoid
+
+  opencart:
+    container_name: opencart-1
+    image: docker.io/bitnami/opencart:4.0.2-3
+    networks:
+      - selenoid
+    ports:
+      - '8082:8080'
+      - '443:8443'
+    environment:
+      - OPENCART_HOST=192.168.1.242:8082
+      - OPENCART_DATABASE_HOST=mariadb
+      - OPENCART_DATABASE_PORT_NUMBER=3306
+      - OPENCART_DATABASE_USER=bn_opencart
+      - OPENCART_DATABASE_NAME=bitnami_opencart
+      - ALLOW_EMPTY_PASSWORD=yes
+    volumes:
+      - 'opencart_data:/bitnami/opencart'
+      - 'opencart_storage_data:/bitnami/opencart_storage/'
+    depends_on:
+      - selenoid
+
+  tests:
+    container_name: tests
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: autotests:1.0.1
+    depends_on:
+      - opencart
+    networks:
+      - selenoid
+    command: ./wait-for-it.sh opencart 8080 pytest -v tests/* --headless --base_url http://opencart:8080 --browser chrome --bv 128 --executor selenoid
+
+networks:
+  selenoid:
+    name: selenoid
+    external: true
+
+volumes:
+  mariadb_data:
+    driver: local
+  opencart_data:
+    driver: local
+  opencart_storage_data:
+    driver: local
