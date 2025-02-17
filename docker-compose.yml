@@ -18,7 +18,7 @@ services:
       - selenoid
     image: "aerokube/selenoid-ui:1.10.11"
     ports:
-      - "8091:8080"
+      - "8083:8080"
     networks:
       - selenoid
     command: [ "--selenoid-uri", "http://selenoid:4444", "-listen", ":8090" ]
@@ -34,7 +34,7 @@ services:
       - PMA_PORT=3306
       - PMA_USER=bn_opencart
     ports:
-      - '8889:80'
+      - '8888:80'
 
   mariadb:
     container_name: mariadb-1
@@ -58,10 +58,10 @@ services:
     networks:
       - selenoid
     ports:
-      - '8082:8080'
+      - '8081:8080'
       - '443:8443'
     environment:
-      - OPENCART_HOST=192.168.1.242:8082
+      - OPENCART_HOST=192.168.0.161:8081
       - OPENCART_DATABASE_HOST=mariadb
       - OPENCART_DATABASE_PORT_NUMBER=3306
       - OPENCART_DATABASE_USER=bn_opencart
