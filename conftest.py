@@ -5,10 +5,11 @@ import pytest
 import datetime
 import os
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.firefox.options import Options as FFOptions
 from selenium.webdriver.edge.options import Options as EdgeOptions
+from page_objects.registr_user_page import RegistrationPage
+
 
 
 def pytest_addoption(parser):
@@ -166,3 +167,9 @@ def browser(request):
         )
 
     request.addfinalizer(fin)
+
+@pytest.fixture
+def create_new_user(browser):
+    registration_page = RegistrationPage(browser)
+    yield registration_page.create_new_user()
+

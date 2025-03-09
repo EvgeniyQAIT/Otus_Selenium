@@ -1,6 +1,7 @@
 from selenium.webdriver.common.by import By
 from page_objects.base_page import BasePage
 import allure
+import time
 
 class MainPage(BasePage):
     TITLE = "Your Store"
@@ -13,10 +14,46 @@ class MainPage(BasePage):
     EUR_OPTION = (By.XPATH, "//*[@href='EUR']")
     GBP_OPTION = (By.XPATH, "//*[@href='GBP']")
     PRICE_ELEMENTS = (By.XPATH, "//div[@class='price']")
+    REGISTER = (By.XPATH, "//a[text()='Register']")
+    LOGOUT = (By.XPATH, "//a[text()='Logout']")
+    LOGIN = (By.XPATH, "//a[text()='Login']")
+    SEARCH = (By.NAME, "search")
+    LOUPE = (By.XPATH, "//*[@id='search']/button")
+    ASSERT_SEARCH_PRODUCT = (By.XPATH, "//*[@id='content']")
 
     @allure.step("Открытие главной страницы")
-    def open(self, **kwargs):
+    def open_main_page(self):
         super().open(self.browser.base_url)
+
+    @allure.step("Переход в окно регистрации нового пользователя")
+    def find_user(self):
+        self.wait_find_element(self.ACCOUNT_LINK).click()
+        self.wait_find_element(self.REGISTER).click()
+
+    @allure.step("Пользователь разлогинивается")
+    def logout_user(self):
+        time.sleep(
+            1.5
+        )  # Страница дозагружается и сбрасывает раскрытое меню, приходится делать минислип, без него никак
+        self._find_element(self.ACCOUNT_LINK).click()
+        self._find_element(self.LOGOUT).click()
+
+    @allure.step("Поиск продукта в строке поиска")
+    def search_product(self, data):
+        self.send_keys(element=self._find_element(self.SEARCH), text=data.name)
+        self._find_element(self.LOUPE).click()
+
+    @allure.step("Подтверждение найденного товара на странице")
+    def assert_search_product(self):
+        # time.sleep(0.5)  # Необходимо для того чтобы обновилась таблица на странице
+        result = self._find_element(self.ASSERT_SEARCH_PRODUCT).text
+        return result
+
+    @allure.step("Логирование новым пользователем")
+    def start_login_user(self):
+        self.wait_find_element(self.ACCOUNT_LINK).click()
+        time.sleep(0.5)
+        self.wait_find_element(self.LOGIN).click()
 
     @allure.step("Проверка количества карточек на главной странице")
     def verify_quantity_cards(self, quantity_cards):
@@ -54,6 +91,7 @@ class MainPage(BasePage):
     def change_currency_to_eur(self):
         self.find_element(*self.CURRENCY_LIST).click()
         self.find_element(*self.EUR_OPTION).click()
+        time.sleep(2)
 
     @allure.step("Проверка изменения валюты на EUR на странице")
     def verify_currency_changed_to_eur(self):
